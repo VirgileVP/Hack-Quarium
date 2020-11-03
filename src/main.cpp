@@ -1,70 +1,36 @@
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <Adafruit_NeoPixel.h>
+#include "../include/HackQuarium.h"
 
 // WIFI consts
 const char* ssid = "octopus-exofam";
 const char* password = "0123456789";
 
-// OpenWeatherMap consts
-const String endpoint = "http://api.openweathermap.org/data/2.5/weather?q=3663517,pt&APPID=";
-const String key = "9d108f420d9e997ca7cafa26e3a8488c";
-
-
-HTTPClient http;
-
-#define LED_PIN 23
-#define LED_COUNT 108
-
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RGBW + NEO_KHZ800);
-
-
-
 void setup() {
-  Serial.begin(115200);
-  strip.begin();
-  strip.show();
- 
-  WiFi.begin(ssid, password);
- 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
- 
-  Serial.println("Connected to the WiFi network");
+	Serial.begin(115200);
+	ledInit();
+	Serial.print("Hello World");
+	WiFi.begin(ssid, password);
+
+	while (WiFi.status() != WL_CONNECTED) {
+		delay(1000);
+		Serial.println("Connecting to WiFi..");
+	}
+
+	Serial.println("Connected to the WiFi network");
+
+	//BMEInit();
 }
 
 void loop() {
-  onAllLed(0, 0, 0, 255);
-  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
+	t_all_data allData;
 
-    
-    HTTPClient http;
- 
-    http.begin(endpoint + key); //Specify the URL
-    int httpCode = http.GET();  //Make the request
- 
-    if (httpCode > 0) { //Check for the returning code
- 
-        String payload = http.getString();
-        Serial.println(httpCode);
-        Serial.println(payload);
-      }
- 
-    else {
-      Serial.println("Error on HTTP request");
-    }
- 
-    http.end(); //Free the resources
-  }
-  delay(3000);
-}
+	parseData(&allData);
 
-void onAllLed(int r, int g, int b, int w) {
-  int i = 0;
-  for (i; i < LED_COUNT; i++) {
-    strip.setPixelColor(i, r, g, b, w);
-  }
-  strip.show();
+	// setAllLeds(0, 0, 1, 0);
+	// meteorRain(0, 0, 100, 255, 10, 64, true, 30);
+	//thunderstorm(0, 0, 1, 0, 0, 0, 0, 255, 30, random(5000));
+	// simpleChase(0, 0, 0, 255, 20);
+	// getCurrentWeather();
+	// delay(3000);
+	//printAirSensorValue();
+    // delay(1000);
 }
