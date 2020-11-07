@@ -1,16 +1,20 @@
 #ifndef HACK_QUARIUM_H
 # define HACK_QUARIUM_H
 # include <SPI.h>
-//  # include <WiFi.h>
 # include <Wire.h>
-//  # include <HTTPClient.h>
 # include <ArduinoJson.h>
 # include <Adafruit_Sensor.h>
 # include <Adafruit_BME280.h>
 # include <Adafruit_NeoPixel.h>
+# include <Scheduler.h>
+# ifdef ESP32
+	# include <WiFi.h>
+	# include <HTTPClient.h>
+# elif defined ESP8266
+	# include <ESP8266WiFi.h>
+	# include <ESP8266HTTPClient.h>
+# endif
 
-# include <ESP8266WiFi.h>
-# include <ESP8266HTTPClient.h>
 
 
 # define LED_PIN 3
@@ -112,21 +116,22 @@ typedef struct			s_HackQuarium_data
 	t_ground_sensor	groundSensor;
 }						t_HackQuarium_data;
 
-typedef struct			s_all_data
+
+class staticData
 {
-	t_API_current_weather	currentWeather;
-	t_HackQuarium_data      HackQuariumData
-}						t_all_data;
-
-
-void	parseData(t_all_data *currentWeather);
+	public:
+		static t_API_current_weather	currentWeather;
+		static t_HackQuarium_data		HackQuariumData;
+};
 
 
 void	ledInit();
-void	setAllLeds(int r, int g, int b, int w);
-void	setPixel(int i, int r, int g, int b, int w);
 void	stripShow();
+void	stripGlobalShow(t_HackQuarium_data *HackQuariumData);
+void	setPixel(int i, int r, int g, int b, int w);
+void	setAllLeds(int r, int g, int b, int w);
 void	simpleChase(int r, int g, int b, int w, int speedDelay);
+void	sunSimulation(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int speed);
 void	meteorRain(byte red, byte green, byte blue, byte white, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
 void	thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
 
