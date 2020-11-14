@@ -1,23 +1,24 @@
 #ifndef HACK_QUARIUM_H
 # define HACK_QUARIUM_H
+# include "FastLED_RGBW.h"
 # include <SPI.h>
 # include <Wire.h>
 # include <ArduinoJson.h>
 # include <Adafruit_Sensor.h>
 # include <Adafruit_BME280.h>
 # include <Adafruit_NeoPixel.h>
-# include <Scheduler.h>
-# ifdef ESP32
-	# include <WiFi.h>
-	# include <HTTPClient.h>
-# elif defined ESP8266
-	# include <ESP8266WiFi.h>
-	# include <ESP8266HTTPClient.h>
-# endif
+// # ifdef ESP32
+# include <WiFi.h>
+# include <HTTPClient.h>
+// # elif defined ESP8266
+// 	# include <ESP8266WiFi.h>
+// 	# include <ESP8266HTTPClient.h>
+//  # include <Scheduler.h>
+// # endif
 
 
 
-# define LED_PIN 3
+# define LED_PIN 23
 # define LED_COUNT 108
 
 # define MOISTURE_SENSOR_PIN 15
@@ -26,10 +27,11 @@
 # define WATERFALL_PIN 12
 # define RAIN_PIN 14
 
+
+
 // #define SEALEVELPRESSURE_HPA (1013.25)
 
 // Adafruit_BME280 bme;
-
 
 struct colorRgbw {
 	unsigned int	red;
@@ -40,8 +42,11 @@ struct colorRgbw {
 
 typedef struct			s_strip_led
 {
-	int			index;
-	colorRgbw	colors;
+	int				index;
+	unsigned int	red;
+	unsigned int	green;
+	unsigned int	blue;
+	unsigned int	white;
 }						t_strip_led;
 
 typedef	struct			s_gps_coord
@@ -104,41 +109,46 @@ typedef	struct			s_air_sensor
 	float	altitude;
 }						t_air_sensor;
 
-typedef	struct			s_ground_sensor
-{
-	int		moisture;
-}						t_ground_sensor;
+// typedef	struct			s_ground_sensor
+// {
+// 	int		moisture;
+// }						t_ground_sensor;
 
 typedef struct			s_HackQuarium_data
 {
 	t_strip_led		stripLed[LED_COUNT];
 	t_air_sensor	airSensor;
-	t_ground_sensor	groundSensor;
+	// t_ground_sensor	groundSensor;
 }						t_HackQuarium_data;
 
-
-class staticData
+typedef struct			s_all_data
 {
+	t_API_current_weather	currentWeather;
+	t_HackQuarium_data		hackQuariumData;
+}						t_all_data;
+
+class AllStaticData {
 	public:
-		static t_API_current_weather	currentWeather;
-		static t_HackQuarium_data		HackQuariumData;
+		static t_all_data allData;
 };
 
+void	test();
 
 void	ledInit();
 void	stripShow();
-void	stripGlobalShow(t_HackQuarium_data *HackQuariumData);
+void	stripGlobalShow(t_all_data allData);
 void	setPixel(int i, int r, int g, int b, int w);
 void	setAllLeds(int r, int g, int b, int w);
-void	simpleChase(int r, int g, int b, int w, int speedDelay);
+void	simpleChase(t_all_data allData, int r, int g, int b, int w, int speedDelay);
 void	sunSimulation(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int speed);
-void	meteorRain(byte red, byte green, byte blue, byte white, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
+// void	meteorRain(byte red, byte green, byte blue, byte white, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
 void	thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
 
-void    BMEInit();
+void	BMEInit();
 void	printAirSensorValue();
 
-JsonArray	getCurrentWeather();
+void		weatherManager(t_all_data allData);
+JsonArray	getAPICurrentWeather();
 
 
 #endif

@@ -4,36 +4,58 @@
 const char* ssid = "octopus-exofam";
 const char* password = "0123456789";
 
+t_all_data AllStaticData::allData;
 
+static TaskHandle_t userTaskHandle = 0;
+static TaskHandle_t FastLEDshowTaskHandle = 0;
+static TaskHandle_t LightTaskHandle = 0;
+static TaskHandle_t WeatherTaskHandle = 0;
+static TaskHandle_t SensorTaskHandle = 0;
 
+void FastLEDshowESP32() {
+	if (userTaskHandle == 0)
+	{
+		userTaskHandle = xTaskGetCurrentTaskHandle();
+		xTaskNotifyGive(FastLEDshowTaskHandle);
+	}
+}
 
-class LedShowTask : public Task {
-public:
-    void loop() {
-        Serial.println("Led task");
-        delay(500);
+void FastLEDshowTask(void *pvParameters) {
+    while(true)
+    {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        stripShow();
+        userTaskHandle = 0; //so we can't have two display tasks at the same time
     }
-} ledShowTask;
+}
 
+void LightTask(void *pvParameters) {
+	while (true) {
+		//thunderstorm(0, 0, 10, 5, 0, 0, 0, 255, 50, random(5000));
+		//simpleChase(AllStaticData::allData, 255, 0, 0, 255, 12);
+		//simpleChase(AllStaticData::allData, 0, 0, 255, 0, 100);
+	}
+}
 
-class WeatherTask : public Task {
-public:
-    void loop() {
-        Serial.println("Weather task");
-        delay(2000);
-    }
-} weatherTask;
+void WeatherTask(void *pvParameters) {
+	while (true) {
+		weatherManager(AllStaticData::allData);
+		delay(1800000);
+	}
+}
 
+void SensorTask(void *pcParameters) {
+	while (true)
+	{
 
-
-
+	}
+}
 
 void setup() {
 	Serial.begin(115200);
 	ledInit();
 
-	pinMode(WATERFALL_PIN, OUTPUT);
-	/*Serial.print("Hello World");
+	//pinMode(WATERFALL_PIN, OUTPUT);
 	WiFi.begin(ssid, password);
 
 	while (WiFi.status() != WL_CONNECTED) {
@@ -42,25 +64,48 @@ void setup() {
 	}
 
 	Serial.println("Connected to the WiFi network");
-*/
+
 	//BMEInit();
 
+	
 
-	Scheduler.start(&ledShowTask);
-	Scheduler.start(&weatherTask);
-	Serial.println(F("SETUP"));
-	Scheduler.begin();
+	Serial.println("Setup()");
+
+	xTaskCreatePinnedToCore(
+					FastLEDshowTask,
+					"FastLEDshowTask",
+					1000,
+					NULL,
+					1,
+					&FastLEDshowTaskHandle,
+					0);
+	xTaskCreatePinnedToCore(
+					LightTask,
+					"LightTask",
+					10000,
+					NULL,
+					1,
+					&LightTaskHandle,
+					1);
+	xTaskCreatePinnedToCore(
+					WeatherTask,
+					"WeatherTask",
+					10000,
+					NULL,
+					1,
+					&WeatherTaskHandle,
+					1);
+	xTaskCreatePinnedToCore(
+					SensorTask,
+					"SensorTask",
+					10000,
+					NULL,
+					1,
+					&SensorTaskHandle,
+					1);
+
 }
 
 void loop() {
-	// t_all_data allData;
-
-	// parseData(&allData);
-	// thunderstorm(0, 0, 1, 0, 0, 0, 0, 255, 7, random(5000));
-	// meteorRain(0, 0, 100, 255, 10, 64, true, 30);
-	// simpleChase(0, 0, 0, 255, 20);
-	// getCurrentWeather();
-	// delay(3000);
-	//printAirSensorValue();
-    // delay(1000);
+	FastLEDshowESP32();
 }
