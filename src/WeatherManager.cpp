@@ -1,6 +1,12 @@
 #include "../include/HackQuarium.h"
 
-void weatherManager(t_all_data allData) {
-    JsonArray   currentWeather = getAPICurrentWeather();
+void weatherManager() {
+	getAPICurrentWeather();
 
+	Serial.print("actual : ");
+	Serial.println(AllStaticData::allData.secondFromEpoch);
+	Serial.print("sunrise : ");
+	Serial.println(WEATHER.timeInfo.sunrise);
+	Serial.print("sunset : ");
+	Serial.println(WEATHER.timeInfo.sunset);
 }

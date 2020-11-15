@@ -1,5 +1,9 @@
 #ifndef HACK_QUARIUM_H
 # define HACK_QUARIUM_H
+# define FASTLED_ESP32_I2S
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
 # include "FastLED_RGBW.h"
 # include <SPI.h>
 # include <Wire.h>
@@ -7,15 +11,12 @@
 # include <Adafruit_Sensor.h>
 # include <Adafruit_BME280.h>
 # include <Adafruit_NeoPixel.h>
-// # ifdef ESP32
 # include <WiFi.h>
 # include <HTTPClient.h>
-// # elif defined ESP8266
-// 	# include <ESP8266WiFi.h>
-// 	# include <ESP8266HTTPClient.h>
-//  # include <Scheduler.h>
-// # endif
 
+# include <time.h>
+# include <ctime>
+# include <iostream>
 
 
 # define LED_PIN 23
@@ -27,7 +28,8 @@
 # define WATERFALL_PIN 12
 # define RAIN_PIN 14
 
-
+# define WEATHER AllStaticData::allData.currentWeather
+# define HACKQUARIUM AllStaticData::allData.hackQuariumData
 
 // #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -92,7 +94,11 @@ typedef	struct			s_API_sky
 
 typedef	struct			s_API_current_weather
 {
-	t_gps_coord	gpsCoord;
+	int				mainWeather;
+	t_gps_coord		gpsCoord;
+	t_API_sky		skyStatement;
+	t_time_info		timeInfo;
+	s_API_air_info	airInfo;
 }						t_API_current_weather;
 
 /*
@@ -125,6 +131,7 @@ typedef struct			s_all_data
 {
 	t_API_current_weather	currentWeather;
 	t_HackQuarium_data		hackQuariumData;
+	int						secondFromEpoch;
 }						t_all_data;
 
 class AllStaticData {
@@ -132,14 +139,16 @@ class AllStaticData {
 		static t_all_data allData;
 };
 
+
+
 void	test();
 
 void	ledInit();
 void	stripShow();
-void	stripGlobalShow(t_all_data allData);
+void	stripGlobalShow();
 void	setPixel(int i, int r, int g, int b, int w);
 void	setAllLeds(int r, int g, int b, int w);
-void	simpleChase(t_all_data allData, int r, int g, int b, int w, int speedDelay);
+void	simpleChase(int r, int g, int b, int w, int speedDelay);
 void	sunSimulation(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int speed);
 // void	meteorRain(byte red, byte green, byte blue, byte white, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
 void	thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
@@ -147,8 +156,9 @@ void	thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, by
 void	BMEInit();
 void	printAirSensorValue();
 
-void		weatherManager(t_all_data allData);
-JsonArray	getAPICurrentWeather();
+void		weatherManager();
+void		getAPICurrentWeather();
+
 
 
 #endif

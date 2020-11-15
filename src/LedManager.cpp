@@ -13,7 +13,7 @@ void test() {
 	while (i < LED_COUNT) {
 		leds[i] = CRGBW(0, 0, 0, 255);
 		i++;
-		delay(10);
+		vTaskDelay(10);
 		FastLED.show();
 	}
 }
@@ -53,7 +53,7 @@ void	setAllLeds(int r, int g, int b, int w) {
 		// strip.setPixelColor(i, r, g, b, w);
 	}
 	Serial.println("set stripled");
-	FastLED.show();
+	//FastLED.show();
 	// stripShow();
 }
 
@@ -64,38 +64,39 @@ void	setPixel(int i, int r, int g, int b, int w) {
 
 
 
-
-
 void	stripShow() {
 	FastLED.show();
 	// Serial.println("FastLED.show() called");
 }
 
-void	setLedArray(t_all_data allData, int index, int red, int green, int blue, int white) {
-	allData.hackQuariumData.stripLed[index].red = red;
-	allData.hackQuariumData.stripLed[index].green = green;
-	allData.hackQuariumData.stripLed[index].blue = blue;
-	allData.hackQuariumData.stripLed[index].white = white;
+
+
+
+void	setLedArray(int index, int red, int green, int blue, int white) {
+	AllStaticData::allData.hackQuariumData.stripLed[index].red = red;
+	AllStaticData::allData.hackQuariumData.stripLed[index].green = green;
+	AllStaticData::allData.hackQuariumData.stripLed[index].blue = blue;
+	AllStaticData::allData.hackQuariumData.stripLed[index].white = white;
 	Serial.print("Led Array ");
 	Serial.print(index);
 	Serial.println(" setted.");
 }
 
-void	stripGlobalShow(t_all_data allData) {
+void	stripGlobalShow() {
 	int i = 0;
 
 	while (i < LED_COUNT) {
-		setPixel(i, allData.hackQuariumData.stripLed[i].red,
-					allData.hackQuariumData.stripLed[i].green,
-					allData.hackQuariumData.stripLed[i].blue,
-					allData.hackQuariumData.stripLed[i].white);
+		setPixel(i, AllStaticData::allData.hackQuariumData.stripLed[i].red,
+					AllStaticData::allData.hackQuariumData.stripLed[i].green,
+					AllStaticData::allData.hackQuariumData.stripLed[i].blue,
+					AllStaticData::allData.hackQuariumData.stripLed[i].white);
 		Serial.print("setPixel(");
 		Serial.print(i);
 		Serial.println(")");
 		i++;
 	}
 	stripShow();
-	delay(15);
+	vTaskDelay(15);
 }
 
 
@@ -111,43 +112,42 @@ void thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, by
 	for(count = 0; count <= repeatThunder; count++) {
 		setAllLeds(red0, green0, blue0, white0);
 		for(count = 0; count < random(15, 50); count++) {
+			if (Pixel + count >= LED_COUNT - 1) {
+				break;
+			}
 			leds[Pixel + count] = CRGBW(red1, green1, blue1, white1);
 			// delay(random(2));
-			if (count == LED_COUNT - 1) {
+		}
+		//stripShow();
+		vTaskDelay(SparkleDelay);
+		for(count = 0; count < random(50); count++) {
+			if (Pixel + count >= LED_COUNT - 1) {
 				break;
 			}
-		}
-		stripShow();
-		delay(SparkleDelay);
-		for(count = 0; count < random(50); count++) {
 			leds[Pixel + count] = CRGBW(red0, green0, blue0, white0);
 			// delay(random(2));
-			if (count == LED_COUNT - 1) {
-				break;
-			}
 		}
-		FastLED.show();
 		//stripShow();
-		delay(random(300));
+		vTaskDelay(random(300));
 	}
 	setAllLeds(red0, green0, blue0, white0);
-	if (random(1) == 1) {
+	if (random(2) == 1) {
 		thunderstorm(red0, green0, blue0, white0, red1, green1, blue1, white1, SparkleDelay, SpeedDelay);
 	}
 	else {
-		delay(SpeedDelay);
+		vTaskDelay(SpeedDelay);
 	}
 }
 
-void	simpleChase(t_all_data allData, int r, int g, int b, int w, int speedDelay) {
+void	simpleChase(int r, int g, int b, int w, int speedDelay) {
 	int count;
 	for(count = 0; count < LED_COUNT; count++) {
 		leds[count] = CRGBW(r, g, b, w);
-		delay(speedDelay);
+		vTaskDelay(speedDelay);
 	}
 	for(count = 0; count < LED_COUNT; count++) {
 		leds[count] = CRGBW(0, 0, 0, 0);
-		delay(speedDelay);
+		vTaskDelay(speedDelay);
 	}
 }
 
@@ -175,8 +175,9 @@ void	colorTransitionAllStrip(byte red0, byte green0, byte blue0, byte white0, by
 				// setPixel((LED_COUNT/6) * (strip + 1) - indexLed - 1, Rnew, Gnew, Bnew, Wnew);
 			strip++;
 		}
-		delay(speed/n);
-		FastLED.show();
+		// delay(speed/n);
+		vTaskDelay(speed/n);
+		//FastLED.show();
 	}
 }
 
