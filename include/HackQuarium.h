@@ -19,14 +19,14 @@
 # include <iostream>
 
 
-# define LED_PIN 23
+# define LED_PIN 22
 # define LED_COUNT 108
 
 # define MOISTURE_SENSOR_PIN 15
 # define AIR_SENSOR_PIN 13
 
 # define WATERFALL_PIN 12
-# define RAIN_PIN 14
+# define RAIN_PIN 32
 
 # define WEATHER AllStaticData::allData.currentWeather
 # define HACKQUARIUM AllStaticData::allData.hackQuariumData
@@ -132,6 +132,7 @@ typedef struct			s_all_data
 	t_API_current_weather	currentWeather;
 	t_HackQuarium_data		hackQuariumData;
 	int						secondFromEpoch;
+	int						activeSunSimulation;
 }						t_all_data;
 
 class AllStaticData {
@@ -148,16 +149,18 @@ void	stripShow();
 void	stripGlobalShow();
 void	setPixel(int i, int r, int g, int b, int w);
 void	setAllLeds(int r, int g, int b, int w);
-void	simpleChase(int r, int g, int b, int w, int speedDelay);
-void	sunSimulation(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int speed);
-// void	meteorRain(byte red, byte green, byte blue, byte white, byte meteorSize, byte meteorTrailDecay, boolean meteorRandomDecay, int SpeedDelay);
-void	thunderstorm(byte red0, byte green0, byte blue0, byte white0, byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
+void	colorTransitionAllLed(byte red, byte green, byte blue, byte white, int speed);
+void	sunSimulation(byte red1, byte green1, byte blue1, byte white1, int speed);
+void	thunderstorm(byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
+
+float	getBrightness();
+CRGBW	calculColors();
 
 void	BMEInit();
 void	printAirSensorValue();
 
-void		weatherManager();
-void		getAPICurrentWeather();
+void	weatherManager();
+void	getAPICurrentWeather();
 
 
 

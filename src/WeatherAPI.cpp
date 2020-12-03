@@ -36,6 +36,7 @@ void	getAPICurrentWeather(){
 	WEATHER.timeInfo.sunrise += WEATHER.timeInfo.timeZone;
 	WEATHER.timeInfo.sunset = doctest["sys"]["sunset"];
 	WEATHER.timeInfo.sunset += WEATHER.timeInfo.timeZone;
+	
 
 	WEATHER.airInfo.averageTemp = doctest["main"]["temp"];
 	WEATHER.airInfo.minTemp = doctest["main"]["temp_min"];
@@ -49,4 +50,7 @@ void	getAPICurrentWeather(){
 		AllStaticData::allData.secondFromEpoch = doctest["dt"];
 		AllStaticData::allData.secondFromEpoch += WEATHER.timeInfo.timeZone;
 	}
+
+	// WEATHER.timeInfo.sunset = AllStaticData::allData.secondFromEpoch + 10;
+
 }
