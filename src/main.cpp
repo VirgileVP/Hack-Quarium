@@ -60,32 +60,6 @@ void LightTask(void *pvParameters) {
 		while (WEATHER.mainWeather >= 200 && WEATHER.mainWeather <= 232 && HACKQUARIUM.inSunSimulation == 0) {
 			thunderstorm(0, 0, 0, 255, 10, random(5000));
 		}
-		// nextColor = calculColors();
-		// thunderstorm(0, 0, 0, 255, 20, random(5000));
-		// vTaskDelay(900000);
-
-		// setAllLeds(5, 5, 25, 25);
-
-		// colorTransitionAllLed(0, 0, 7, 7, 5000);
-		// sunSimulation(50, 20, 0, 0, 5000);
-		// sunSimulation(50, 20, 0, 30, 5000);
-		// colorTransitionAllLed(255, 100, 0, 180, 10000);
-		// colorTransitionAllLed(255, 100, 0, 180, 5000);
-		// sunSimulation(50, 25, 0, 50, 10000);
-		// sunSimulation(50, 12, 0, 0, 5000);
-		// colorTransitionAllLed(0, 0, 7, 7, 5000);
-		
-		// setAllLeds(255, 100, 0, 0);
-		// vTaskDelay(5000);
-		// setAllLeds(255, 100, 0, 180);
-		// vTaskDelay(5000);
-		// setAllLeds(0, 0, 100, 255);
-		// vTaskDelay(5000);
-		// setAllLeds(255, 150, 0, 0);
-		// vTaskDelay(5000);
-		// setAllLeds(255, 150, 0, 255);
-		// vTaskDelay(5000);
-		// colorTransitionAllLed(0, 0, 0, 255, 30000);
 	}
 }
 
@@ -180,6 +154,8 @@ void SunTask(void *pcParameters) {
 		}
 		else if (AllStaticData::allData.secondFromEpoch != 0 && AllStaticData::allData.secondFromEpoch == WEATHER.timeInfo.sunset) {
 			Serial.println("SUNSET");
+			sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
+			nextColor = calculColors();
 			sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
 			// sunSimulation(50, 12, 0, 0, 1800000);
 			// colorTransitionAllLed(0, 0, 7, 7, 180000);
