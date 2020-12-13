@@ -19,7 +19,7 @@
 # include <iostream>
 
 
-# define LED_PIN 22
+# define LED_PIN 23
 # define LED_COUNT 108
 
 # define MOISTURE_SENSOR_PIN 15
@@ -32,8 +32,6 @@
 # define HACKQUARIUM AllStaticData::allData.hackQuariumData
 
 // #define SEALEVELPRESSURE_HPA (1013.25)
-
-// Adafruit_BME280 bme;
 
 struct colorRgbw {
 	unsigned int	red;
@@ -124,6 +122,7 @@ typedef struct			s_HackQuarium_data
 {
 	t_strip_led		stripLed[LED_COUNT];
 	t_air_sensor	airSensor;
+	int				inSunSimulation = 0;
 	// t_ground_sensor	groundSensor;
 }						t_HackQuarium_data;
 
@@ -132,7 +131,6 @@ typedef struct			s_all_data
 	t_API_current_weather	currentWeather;
 	t_HackQuarium_data		hackQuariumData;
 	int						secondFromEpoch;
-	int						activeSunSimulation;
 }						t_all_data;
 
 class AllStaticData {
@@ -161,6 +159,15 @@ void	printAirSensorValue();
 
 void	weatherManager();
 void	getAPICurrentWeather();
+
+int		getActualHour();
+int		getActualMinutes();
+
+
+int     softRain();
+int     normalRain();
+int     heavyRain();
+int		checkHumidity();
 
 
 

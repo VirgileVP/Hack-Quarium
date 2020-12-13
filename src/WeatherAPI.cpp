@@ -51,6 +51,6 @@ void	getAPICurrentWeather(){
 		AllStaticData::allData.secondFromEpoch += WEATHER.timeInfo.timeZone;
 	}
 
-	// WEATHER.timeInfo.sunset = AllStaticData::allData.secondFromEpoch + 10;
+	// WEATHER.timeInfo.sunrise = AllStaticData::allData.secondFromEpoch + 15;
 
 }

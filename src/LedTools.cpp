@@ -11,13 +11,13 @@ CRGBW	calculNightColors() {
 	float	cloudColorCalibration = 1;
 
 	Serial.println("NIGHT");
-	if (AllStaticData::allData.secondFromEpoch % 60 >= (WEATHER.timeInfo.sunset % 60 + 5) ||
-		AllStaticData::allData.secondFromEpoch % 60 <= 2) {
-		Serial.println("  FULL NIGHT");
+	if (AllStaticData::allData.secondFromEpoch/3600 % 24 >= (WEATHER.timeInfo.sunset/3600 % 24 + 5) ||
+		AllStaticData::allData.secondFromEpoch/3600 % 24 <= 2) {
+		Serial.println("  FULL NIGHT : " + String(getActualHour()) + "H" + String(getActualMinutes()));
 		// FULL NIGHT
 
 		if (WEATHER.skyStatement.clouds <= 50) {
-			Serial.println("    < 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// < 50% cloudness
 
 			retColor.r = 0;
@@ -26,7 +26,7 @@ CRGBW	calculNightColors() {
 			retColor.w = 15;
 		}
 		else {
-			Serial.println("    > 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// > 50% cloudness
 
 			cloudColorCalibration = float(map(WEATHER.skyStatement.clouds, 0, 100, 20, 100));
@@ -38,19 +38,20 @@ CRGBW	calculNightColors() {
 			}
 	}
 	else {
+		Serial.println("  SOFT NIGHT : " + String(getActualHour()) + "H" + String(getActualMinutes()));
 		// SOFT NIGHT
 
 		if (WEATHER.skyStatement.clouds <= 50) {
-			Serial.println("    < 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// < 50% cloudness
 
-			retColor.r = 50;
-			retColor.g = 15;
+			retColor.r = 40;
+			retColor.g = 10;
 			retColor.b = 0;
 			retColor.w = 0;
 		}
 		else {
-			Serial.println("    > 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// > 50% cloudness
 
 			cloudColorCalibration = float(map(WEATHER.skyStatement.clouds, 0, 100, 20, 100));
@@ -69,13 +70,13 @@ CRGBW	calculDayColors() {
 	CRGBW	retColor;
 	float	cloudColorCalibration = 1;
 	Serial.println("DAY");
-	if (AllStaticData::allData.secondFromEpoch % 60 >= WEATHER.timeInfo.sunrise % 60 + 4 &&
-		AllStaticData::allData.secondFromEpoch % 60 <= WEATHER.timeInfo.sunset % 60 - 2) {
+	if (AllStaticData::allData.secondFromEpoch/3600 % 24 > WEATHER.timeInfo.sunrise/3600 % 24 + 4 &&
+		AllStaticData::allData.secondFromEpoch/3600 % 24 <= WEATHER.timeInfo.sunset/3600 % 24 - 2) {
+		Serial.println("  FULL DAY : " + String(getActualHour()) + "H" + String(getActualMinutes()));
 		// FULL DAY
 
-		Serial.println("  FULL DAY");
 		if (WEATHER.skyStatement.clouds <= 50) {
-			Serial.println("    < 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// < 50% cloudness
 
 			retColor.r = 255;
@@ -84,7 +85,7 @@ CRGBW	calculDayColors() {
 			retColor.w = 255;
 		}
 		else {
-			Serial.println("    > 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// > 50% cloudness
 
 			cloudColorCalibration = float(map(WEATHER.skyStatement.clouds, 0, 100, 20, 100));
@@ -92,16 +93,16 @@ CRGBW	calculDayColors() {
 
 			retColor.r = 100 * cloudColorCalibration;
 			retColor.g = 40 * cloudColorCalibration;
-			retColor.b = 100 * (1 - cloudColorCalibration);
+			retColor.b = 60 * (1 - cloudColorCalibration);
 			retColor.w = 200;
 			}
 	}
 	else {
+		Serial.println("  SOFT DAY : " + String(getActualHour()) + "H" + String(getActualMinutes()));
 		// SOFT DAY
 
-		Serial.println("  SOFT DAY");
 		if (WEATHER.skyStatement.clouds <= 50) {
-			Serial.println("    < 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// < 50% cloudness
 			retColor.r = 255;
 			retColor.g = 100;
@@ -109,7 +110,7 @@ CRGBW	calculDayColors() {
 			retColor.w = 100;
 		}
 		else {
-			Serial.println("    > 50% cloudness");
+			Serial.println("    " + String(WEATHER.skyStatement.clouds) + "% cloudness");
 			// > 50% cloudness
 
 			cloudColorCalibration = float(map(WEATHER.skyStatement.clouds, 0, 100, 20, 100));
@@ -126,7 +127,9 @@ CRGBW	calculDayColors() {
 
 CRGBW	calculColors() {
 	CRGBW	retColor;
-	if (AllStaticData::allData.secondFromEpoch < WEATHER.timeInfo.sunrise) {
+
+	if (AllStaticData::allData.secondFromEpoch/3600 % 24 >= WEATHER.timeInfo.sunset/3600 % 24 && AllStaticData::allData.secondFromEpoch/3600 % 24 <= 23 
+	 || AllStaticData::allData.secondFromEpoch/3600 % 24 < WEATHER.timeInfo.sunset/3600 % 24 && AllStaticData::allData.secondFromEpoch < WEATHER.timeInfo.sunrise/3600 % 24) {
 		// NIGHT
 		retColor = calculNightColors();
 	}

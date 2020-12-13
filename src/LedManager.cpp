@@ -41,11 +41,7 @@ void thunderstorm(byte red1, byte green1, byte blue1, byte white1, int SparkleDe
 	int		count;
 	int		repeatThunder = random(3);
 	CRGBW	currentColor = calculColors();
-	// CRGBW	currentColor;
-	// currentColor.r = 0;
-	// currentColor.g = 0;
-	// currentColor.b = 5;
-	// currentColor.w = 3;
+
 	if (repeatThunder == 0)
 		repeatThunder = 1;
 	for(count = 0; count <= repeatThunder; count++) {
@@ -81,6 +77,7 @@ void	colorTransitionAllLed(byte red, byte green, byte blue, byte white, int spee
 	int	Gnew;
 	int	Bnew;
 	int	Wnew;
+	Serial.println("in colorTransitionAllLed()");
 	CRGBW startColor[LED_COUNT];
 	for (int tempI = 0; tempI < LED_COUNT; tempI++) {
 		startColor[tempI] = leds[tempI];
@@ -143,12 +140,13 @@ void	colorTransitionAllStrip(byte red1, byte green1, byte blue1, byte white1, in
 void	sunSimulation(byte red1, byte green1, byte blue1, byte white1, int speed) {
 	int countLed = 0;
 
-	AllStaticData::allData.activeSunSimulation = 1;
+	HACKQUARIUM.inSunSimulation = 1;
 	// setAllLeds(red0, green0, blue0, white0);
-	Serial.println("\n\n\n    sunSimulation()");
+	Serial.println("\nin sunSimulation()");
 	while(countLed < LED_COUNT/6) {
 		colorTransitionAllStrip(red1, green1, blue1, white1, speed/(LED_COUNT/6), countLed);
 		countLed++;
 	}
-	AllStaticData::allData.activeSunSimulation = 0;
+	Serial.println("out sunSimulation()");
+	HACKQUARIUM.inSunSimulation = 0;
 }
