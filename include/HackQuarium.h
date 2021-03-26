@@ -19,19 +19,19 @@
 # include <iostream>
 
 
-# define LED_PIN 23
+# define LED_PIN 19
 # define LED_COUNT 108
 
-# define MOISTURE_SENSOR_PIN 15
-# define AIR_SENSOR_PIN 13
+// # define MOISTURE_SENSOR_PIN 18
+// # define AIR_SENSOR_PIN 13
 
-# define WATERFALL_PIN 12
+// # define WATERFALL_PIN 12
 # define RAIN_PIN 32
 
 # define WEATHER AllStaticData::allData.currentWeather
 # define HACKQUARIUM AllStaticData::allData.hackQuariumData
 
-// #define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 struct colorRgbw {
 	unsigned int	red;
@@ -113,16 +113,18 @@ typedef	struct			s_air_sensor
 	float	altitude;
 }						t_air_sensor;
 
-// typedef	struct			s_ground_sensor
-// {
-// 	int		moisture;
-// }						t_ground_sensor;
+typedef	struct			s_moisture_sensor
+{
+	int		moisture;
+}						t_moisture_sensor;
 
 typedef struct			s_HackQuarium_data
 {
 	t_strip_led		stripLed[LED_COUNT];
 	t_air_sensor	airSensor;
+	t_air_sensor	moistureSensor;
 	int				inSunSimulation = 0;
+	int				inCloudSimulation = 0;
 	// t_ground_sensor	groundSensor;
 }						t_HackQuarium_data;
 
@@ -150,6 +152,8 @@ void	setAllLeds(int r, int g, int b, int w);
 void	colorTransitionAllLed(byte red, byte green, byte blue, byte white, int speed);
 void	sunSimulation(byte red1, byte green1, byte blue1, byte white1, int speed);
 void	thunderstorm(byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay);
+void	cloudEffect(int speed);
+
 
 float	getBrightness();
 CRGBW	calculColors();
@@ -168,6 +172,8 @@ int     softRain();
 int     normalRain();
 int     heavyRain();
 int		checkHumidity();
+
+int		isThunder();
 
 
 

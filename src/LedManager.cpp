@@ -39,12 +39,13 @@ void	stripShow() {
 void thunderstorm(byte red1, byte green1, byte blue1, byte white1, int SparkleDelay, int SpeedDelay) {
 	int		Pixel = random(LED_COUNT);
 	int		count;
-	int		repeatThunder = random(3);
+	int		repeatThunder = random(4);
 	CRGBW	currentColor = calculColors();
 
 	if (repeatThunder == 0)
 		repeatThunder = 1;
 	for(count = 0; count <= repeatThunder; count++) {
+		Serial.println("------ Thunder ------");
 		setAllLeds(currentColor.r, currentColor.g, currentColor.b, currentColor.w);
 		for(count = 0; count < random(15, 50); count++) {
 			if (Pixel + count >= LED_COUNT - 1) {
@@ -59,7 +60,7 @@ void thunderstorm(byte red1, byte green1, byte blue1, byte white1, int SparkleDe
 			}
 			leds[Pixel + count] = CRGBW(currentColor.r, currentColor.g, currentColor.b, currentColor.w);
 		}
-		vTaskDelay(random(300));
+		vTaskDelay(random(150));
 	}
 	setAllLeds(currentColor.r, currentColor.g, currentColor.b, currentColor.w);
 	if (random(2) == 1) {
@@ -77,7 +78,7 @@ void	colorTransitionAllLed(byte red, byte green, byte blue, byte white, int spee
 	int	Gnew;
 	int	Bnew;
 	int	Wnew;
-	Serial.println("in colorTransitionAllLed()");
+	// Serial.println("in colorTransitionAllLed()");
 	CRGBW startColor[LED_COUNT];
 	for (int tempI = 0; tempI < LED_COUNT; tempI++) {
 		startColor[tempI] = leds[tempI];
@@ -94,6 +95,7 @@ void	colorTransitionAllLed(byte red, byte green, byte blue, byte white, int spee
 		}
 		vTaskDelay(speed/n);
 	}
+	// Serial.println("end colorTransitionAllLed()");
 }
 
 void	colorTransitionAllStrip(byte red1, byte green1, byte blue1, byte white1, int speed, int indexLed) {
@@ -110,10 +112,6 @@ void	colorTransitionAllStrip(byte red1, byte green1, byte blue1, byte white1, in
 
 	for (int i = 0; i <= n; i++)
 	{
-		// Rnew = HACKQUARIUM.stripLed[i].red + (red1 - HACKQUARIUM.stripLed[i].red) * i / n;
-		// Gnew = HACKQUARIUM.stripLed[i].green + (green1 - HACKQUARIUM.stripLed[i].green) * i / n;
-		// Bnew = HACKQUARIUM.stripLed[i].blue + (blue1 - HACKQUARIUM.stripLed[i].blue) * i / n;
-		// Wnew = HACKQUARIUM.stripLed[i].white + (white1 - HACKQUARIUM.stripLed[i].white) * i / n;
 		strip = 0;
 		while (strip < 6) {
 			if (strip % 2 == 0) {
@@ -137,6 +135,36 @@ void	colorTransitionAllStrip(byte red1, byte green1, byte blue1, byte white1, in
 	}
 }
 
+/*
+** colorTransitionOneStrip :
+** NOT FINISH
+*/
+void	colorTransitionOneStrip(byte red1, byte green1, byte blue1, byte white1, int speed, int indexStrip) {
+	int n = 50;
+	// int	index = (LED_COUNT / 6) * indexStrip;
+	int	indexEnd = (LED_COUNT / 6) * (indexStrip + 1) - 1;
+	int	Rnew;
+	int	Gnew;
+	int	Bnew;
+	int	Wnew;
+	CRGBW startColor = leds[(LED_COUNT / 6) * indexStrip];
+	// for (int tempI = 0; tempI < LED_COUNT; tempI++) {
+	// 	startColor[tempI] = leds[tempI];
+	// }
+
+	for (int i = 0; i <= n; i++)
+	{
+		for (int index = (LED_COUNT / 6) * indexStrip; index <= indexEnd; index++) {
+			Rnew = (red1 - startColor.r) * i / n + startColor.r;
+			Gnew = (green1 - startColor.g) * i / n + startColor.g;
+			Bnew = (blue1 - startColor.b) * i / n + startColor.b;
+			Wnew = (white1 - startColor.w) * i / n + startColor.w;
+			setPixel(index, Rnew, Gnew, Bnew, Wnew);
+		}
+		vTaskDelay(speed/n);
+	}
+}
+
 void	sunSimulation(byte red1, byte green1, byte blue1, byte white1, int speed) {
 	int countLed = 0;
 
@@ -149,4 +177,33 @@ void	sunSimulation(byte red1, byte green1, byte blue1, byte white1, int speed) {
 	}
 	Serial.println("out sunSimulation()");
 	HACKQUARIUM.inSunSimulation = 0;
+}
+
+
+void	cloudEffect(int speed) {
+	CRGBW actualColors = calculColors();
+	HACKQUARIUM.inCloudSimulation = 1;
+	colorTransitionAllLed(actualColors.r, actualColors.g, actualColors.b, actualColors.w, 5000);
+	int countLine = 0;
+
+	for(countLine = 0; countLine < 6; countLine++) {
+		// Serial.print("           in cloudEffect() 1\n");
+		colorTransitionOneStrip(actualColors.red / 4,
+								actualColors.green / 4,
+								actualColors.blue / 4,
+								actualColors.white / 4,
+								(speed / 2) / 6,
+								countLine);
+	}
+	actualColors = calculColors();
+	for(countLine = 0; countLine < 6; countLine++) {
+		// Serial.print("           in cloudEffect() 2\n");
+		colorTransitionOneStrip(actualColors.red,
+								actualColors.green,
+								actualColors.blue,
+								actualColors.white,
+								(speed / 2) / 6,
+								countLine);
+	}
+	HACKQUARIUM.inCloudSimulation = 0;
 }

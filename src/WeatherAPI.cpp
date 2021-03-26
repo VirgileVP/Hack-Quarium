@@ -6,7 +6,7 @@ const String APIURI = "http://api.openweathermap.org/data/2.5/weather?q=Manaus,3
 
 void	getAPICurrentWeather(){
 	// DynamicJsonDocument doc(806);
-	StaticJsonDocument<1024> doctest;
+	StaticJsonDocument<1024> jsonWeather;
 	String payload;
 	if ((WiFi.status() == WL_CONNECTED)) {
 		HTTPClient http;
@@ -23,32 +23,33 @@ void	getAPICurrentWeather(){
 		http.end();
 	}
 
-	deserializeJson(doctest, payload);
+	deserializeJson(jsonWeather, payload);
 
 
-	WEATHER.gpsCoord.latitude = doctest["coord"]["lat"];
-	WEATHER.gpsCoord.longitude = doctest["coord"]["lon"];
+	WEATHER.gpsCoord.latitude = jsonWeather["coord"]["lat"];
+	WEATHER.gpsCoord.longitude = jsonWeather["coord"]["lon"];
 
-	WEATHER.skyStatement.clouds = doctest["clouds"]["all"];
+	WEATHER.skyStatement.clouds = jsonWeather["clouds"]["all"];
 
-	WEATHER.timeInfo.timeZone = doctest["timezone"];
-	WEATHER.timeInfo.sunrise = doctest["sys"]["sunrise"];
+	WEATHER.timeInfo.timeZone = jsonWeather["timezone"];
+	WEATHER.timeInfo.sunrise = jsonWeather["sys"]["sunrise"];
 	WEATHER.timeInfo.sunrise += WEATHER.timeInfo.timeZone;
-	WEATHER.timeInfo.sunset = doctest["sys"]["sunset"];
+	WEATHER.timeInfo.sunset = jsonWeather["sys"]["sunset"];
 	WEATHER.timeInfo.sunset += WEATHER.timeInfo.timeZone;
 	
 
-	WEATHER.airInfo.averageTemp = doctest["main"]["temp"];
-	WEATHER.airInfo.minTemp = doctest["main"]["temp_min"];
-	WEATHER.airInfo.maxTemp = doctest["main"]["temp_max"];
-	WEATHER.airInfo.pressure = doctest["main"]["pressure"];
-	WEATHER.airInfo.humidity = doctest["main"]["humidity"];
+	WEATHER.airInfo.averageTemp = jsonWeather["main"]["temp"];
+	WEATHER.airInfo.minTemp = jsonWeather["main"]["temp_min"];
+	WEATHER.airInfo.maxTemp = jsonWeather["main"]["temp_max"];
+	WEATHER.airInfo.pressure = jsonWeather["main"]["pressure"];
+	WEATHER.airInfo.humidity = jsonWeather["main"]["humidity"];
 
-	WEATHER.mainWeather = doctest["weather"][0]["id"];
+	WEATHER.mainWeather = jsonWeather["weather"][0]["id"];
 
 	if (AllStaticData::allData.secondFromEpoch == 0) {
-		AllStaticData::allData.secondFromEpoch = doctest["dt"];
-		AllStaticData::allData.secondFromEpoch += WEATHER.timeInfo.timeZone;
+		AllStaticData::allData.secondFromEpoch = jsonWeather["dt"];
+		// AllStaticData::allData.secondFromEpoch += WEATHER.timeInfo.timeZone;
+		AllStaticData::allData.secondFromEpoch += 3600;
 	}
 
 	// WEATHER.timeInfo.sunrise = AllStaticData::allData.secondFromEpoch + 15;

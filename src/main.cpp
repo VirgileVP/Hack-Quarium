@@ -13,6 +13,7 @@ static TaskHandle_t FastLEDshowTaskHandle = 0;
 static TaskHandle_t LightTaskHandle = 0;
 static TaskHandle_t SunTaskHandle = 0;
 static TaskHandle_t RainTaskHandle = 0;
+static TaskHandle_t CloudTaskHandle = 0;
 static TaskHandle_t WeatherTaskHandle = 0;
 static TaskHandle_t SensorTaskHandle = 0;
 static TaskHandle_t TimeTaskHandle = 0;
@@ -43,50 +44,90 @@ void LightTask(void *pvParameters) {
 	// Serial.println(nextColor.w);
 	// colorTransitionAllLed(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 10000);
 	// colorTransitionAllLed(0, 0, 7, 15, 10000);
-	colorTransitionAllLed(255, 0, 0, 0, 1000);
-	colorTransitionAllLed(0, 255, 0, 0, 1000);
-	colorTransitionAllLed(0, 0, 255, 0, 1000);
-	colorTransitionAllLed(0, 0, 0, 255, 1000);
-	colorTransitionAllLed(255, 255, 255, 255, 1000);
-	colorTransitionAllLed(0, 0, 0, 0, 1000);
-	delay(1000);
+	// while (1) {
+	// 	setAllLeds(255, 0, 0, 0);
+	// 	delay(30);
+	// 	setAllLeds(0, 0, 0, 0);
+	// 	delay(50);
+	// 	setAllLeds(0, 0, 255, 0);
+	// 	delay(50);
+	// 	setAllLeds(0, 0, 0, 0);
+	// 	delay(50);
+	// }
+	colorTransitionAllLed(255, 0, 0, 0, 800);
+	// delay(1000);
+	colorTransitionAllLed(0, 255, 0, 0, 800);
+	// delay(1000);
+	colorTransitionAllLed(0, 0, 255, 0, 800);
+	// delay(1000);
+	colorTransitionAllLed(0, 0, 0, 255, 800);
+	// delay(1000);
+	colorTransitionAllLed(0, 0, 0, 0, 800);
+	// delay(1000);
+	// colorTransitionAllLed(255, 255, 255, 255, 1000);
 	while (true) {
 		Serial.println("in LightTask()");
-		if (HACKQUARIUM.inSunSimulation == 0) {
+		if (HACKQUARIUM.inSunSimulation == 0 && HACKQUARIUM.inCloudSimulation == 0) {
 			nextColor = calculColors();
 			colorTransitionAllLed(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 10000);
-			delay(900010); // 15 minutes et 10 centiemes
+			delay(300010 ); // 5 minutes et 10 centiemes
 		}
-		while (WEATHER.mainWeather >= 200 && WEATHER.mainWeather <= 232 && HACKQUARIUM.inSunSimulation == 0) {
-			thunderstorm(0, 0, 0, 255, 10, random(5000));
+		while (isThunder() == 2 && HACKQUARIUM.inSunSimulation == 0 && HACKQUARIUM.inCloudSimulation == 0) {
+			thunderstorm(0, 0, 0, 255, 10, random(10000));
+		}
+		while (isThunder() == 1 && HACKQUARIUM.inSunSimulation == 0 && HACKQUARIUM.inCloudSimulation == 0) {
+			thunderstorm(0, 0, 0, 255, 10, random(35000));
 		}
 	}
 }
 
 void RainTask(void *pvParameters) {
 	while (true) {
-		// Serial.println("in RainTask()");
+		Serial.println("in RainTask()");
 		while (softRain() == 1) {
-			while (checkHumidity() == 0) {
-				delay(10000);
-			}
-			digitalWrite(WATERFALL_PIN, HIGH); //OFF
-			vTaskDelay(30000);
-			digitalWrite(WATERFALL_PIN, LOW); //ON
-			vTaskDelay(10000);
+			// while (checkHumidity() == 0) {
+			// 	delay(10000);
+			// }
+			digitalWrite(RAIN_PIN, HIGH); //OFF
+			Serial.println("rain OFF");
+			vTaskDelay(40000);
+			digitalWrite(RAIN_PIN, LOW); //ON
+			Serial.println("rain ON");
+			vTaskDelay(5000);
 		}
 		while (normalRain() == 1) {
-			digitalWrite(WATERFALL_PIN, HIGH); //OFF
-			vTaskDelay(20000);
-			digitalWrite(WATERFALL_PIN, LOW); //ON
-			vTaskDelay(20000);
+			digitalWrite(RAIN_PIN, HIGH); //OFF
+			Serial.println("rain OFF");
+			vTaskDelay(30000);
+			digitalWrite(RAIN_PIN, LOW); //ON
+			Serial.println("rain ON");
+			vTaskDelay(10000);
 		}
 		while (heavyRain() == 1) {
-			digitalWrite(WATERFALL_PIN, HIGH); //OFF
-			vTaskDelay(10000);
-			digitalWrite(WATERFALL_PIN, LOW); //ON
-			vTaskDelay(30000);
+			digitalWrite(RAIN_PIN, HIGH); //OFF
+			Serial.println("rain OFF");
+			vTaskDelay(20000);
+			digitalWrite(RAIN_PIN, LOW); //ON
+			Serial.println("rain ON");
+			vTaskDelay(5000);
+		}
+		delay(5000);
+	}
+}
 
+void CloudTask(void *pvParameters) {
+	delay(20000);
+	Serial.println("---- CloudTask() ----");
+	while (true) {
+		Serial.println("in CloudTask() : ");
+		while (WEATHER.skyStatement.clouds >= 50
+			&& isThunder() == 0
+			&& HACKQUARIUM.inSunSimulation == 0) {
+			cloudEffect(random(15000, 60000));
+			if (WEATHER.skyStatement.clouds > 80)
+				delay(random(5000, 30000));
+			else
+				delay(random(15000, 60000));
 		}
 		delay(5000);
 	}
@@ -139,7 +180,7 @@ void TimeTask(void *pcParameters) {
 void SunTask(void *pcParameters) {
 	CRGBW nextColor;
 	while (true) {
-		Serial.println("In SunTask()");
+		// Serial.println("In SunTask()");
 		nextColor = calculColors();
 		// Serial.print("    ");
 		// Serial.print("    actual : ");
@@ -148,15 +189,19 @@ void SunTask(void *pcParameters) {
 		// Serial.println(WEATHER.timeInfo.sunrise - AllStaticData::allData.secondFromEpoch);
 		// Serial.print("    sunset : ");
 		// Serial.println(WEATHER.timeInfo.sunset - AllStaticData::allData.secondFromEpoch);
-		if (AllStaticData::allData.secondFromEpoch != 0 && AllStaticData::allData.secondFromEpoch == WEATHER.timeInfo.sunrise) {
+		if (AllStaticData::allData.secondFromEpoch != 0
+		 && AllStaticData::allData.secondFromEpoch == WEATHER.timeInfo.sunrise
+		 && AllStaticData::allData.hackQuariumData.inCloudSimulation == 0) {
 			Serial.println("SUNRISE");
 			sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
 		}
-		else if (AllStaticData::allData.secondFromEpoch != 0 && AllStaticData::allData.secondFromEpoch == WEATHER.timeInfo.sunset) {
+		else if (AllStaticData::allData.secondFromEpoch != 0
+			&& AllStaticData::allData.secondFromEpoch == WEATHER.timeInfo.sunset
+			&& AllStaticData::allData.hackQuariumData.inCloudSimulation == 0) {
 			Serial.println("SUNSET");
 			sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
-			nextColor = calculColors();
-			sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
+			// nextColor = calculColors();
+			// sunSimulation(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 2100000);
 			// sunSimulation(50, 12, 0, 0, 1800000);
 			// colorTransitionAllLed(0, 0, 7, 7, 180000);
 			// sunSimulation(0 , 0, 25, 10, 1800000);
@@ -169,8 +214,13 @@ void setup() {
 	Serial.begin(115200);
 	ledInit();
 
-	pinMode(WATERFALL_PIN, OUTPUT);
+	// pinMode(WATERFALL_PIN, OUTPUT);
 	pinMode(RAIN_PIN, OUTPUT);
+	// pinMode(MOISTURE_SENSOR_PIN, INPUT);
+
+	digitalWrite(RAIN_PIN, HIGH); //OFF
+	// digitalWrite(WATERFALL_PIN, HIGH); //OFF
+
 	WiFi.begin(ssid, password);
 
 	while (WiFi.status() != WL_CONNECTED) {
@@ -179,14 +229,32 @@ void setup() {
 	}
 
 	Serial.println("Connected to the WiFi network");
-	// BMEInit();
-	// bme.begin(0x76);  
+	bme.begin(0x76);
 	Serial.println("Setup()");
+	
+	
+	// int humidity;
+	// while (1) {
+	// 	humidity = bme.readHumidity();
+	// 	Serial.println(humidity);
+	// 	delay(500);
+	// }
 
 
 	bzero(&AllStaticData::allData, sizeof(AllStaticData));
 	// setAllLeds(255, 90, 0, 150);
 	// FastLED.show();
+
+	// while (1) {
+	// 	digitalWrite(WATERFALL_PIN, HIGH); //OFF
+	// // 	digitalWrite(RAIN_PIN, HIGH); //OFF
+	// // 	Serial.println("test off");
+	// 	delay(2000);
+	// 	digitalWrite(WATERFALL_PIN, LOW); //ON
+	// // 	digitalWrite(RAIN_PIN, LOW); //ON
+	// // 	Serial.println("test on");
+	// 	delay(2000);
+	// }
 
 
 	xTaskCreatePinnedToCore(
@@ -228,6 +296,14 @@ void setup() {
 					NULL,
 					1,
 					&SunTaskHandle,
+					1);
+	xTaskCreatePinnedToCore(
+					CloudTask,
+					"CloudTask",
+					10000,
+					NULL,
+					1,
+					&CloudTaskHandle,
 					1);
 	xTaskCreatePinnedToCore(
 					RainTask,
