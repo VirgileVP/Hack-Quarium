@@ -120,11 +120,11 @@ typedef	struct			s_moisture_sensor
 
 typedef struct			s_HackQuarium_data
 {
-	t_strip_led		stripLed[LED_COUNT];
-	t_air_sensor	airSensor;
-	t_air_sensor	moistureSensor;
-	int				inSunSimulation = 0;
-	int				inCloudSimulation = 0;
+	t_strip_led			stripLed[LED_COUNT];
+	t_air_sensor		airSensor;
+	t_moisture_sensor	moistureSensor;
+	int					inSunSimulation = 0;
+	int					inCloudSimulation = 0;
 	// t_ground_sensor	groundSensor;
 }						t_HackQuarium_data;
 
@@ -168,9 +168,12 @@ int		getActualHour();
 int		getActualMinutes();
 
 
-int     softRain();
-int     normalRain();
-int     heavyRain();
+int     isSoftRain();
+int     isNormalRain();
+int     isHeavyRain();
+void    goSoftRain();
+void    goNormalRain();
+void    goHeavyRain();
 int		checkHumidity();
 
 int		isThunder();

@@ -84,32 +84,23 @@ void LightTask(void *pvParameters) {
 void RainTask(void *pvParameters) {
 	while (true) {
 		Serial.println("in RainTask()");
-		while (softRain() == 1) {
+		while (isSoftRain() == 1) {
+			goSoftRain();
 			// while (checkHumidity() == 0) {
-			// 	delay(10000);
+			// 	delay(1800000);
 			// }
-			digitalWrite(RAIN_PIN, HIGH); //OFF
-			Serial.println("rain OFF");
-			vTaskDelay(40000);
-			digitalWrite(RAIN_PIN, LOW); //ON
-			Serial.println("rain ON");
-			vTaskDelay(5000);
 		}
-		while (normalRain() == 1) {
-			digitalWrite(RAIN_PIN, HIGH); //OFF
-			Serial.println("rain OFF");
-			vTaskDelay(30000);
-			digitalWrite(RAIN_PIN, LOW); //ON
-			Serial.println("rain ON");
-			vTaskDelay(10000);
+		while (isNormalRain() == 1) {
+			goNormalRain();
+			// while (checkHumidity() == 0) {
+			// 	delay(1800000);
+			// }
 		}
-		while (heavyRain() == 1) {
-			digitalWrite(RAIN_PIN, HIGH); //OFF
-			Serial.println("rain OFF");
-			vTaskDelay(20000);
-			digitalWrite(RAIN_PIN, LOW); //ON
-			Serial.println("rain ON");
-			vTaskDelay(5000);
+		while (isHeavyRain() == 1) {
+			goHeavyRain();
+			// while (checkHumidity() == 0) {
+			// 	delay(1800000);
+			// }
 		}
 		delay(5000);
 	}
