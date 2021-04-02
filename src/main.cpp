@@ -37,23 +37,6 @@ void FastLEDshowTask(void *pvParameters) {
 
 void LightTask(void *pvParameters) {
 	CRGBW nextColor;
-	// nextColor = calculColors();
-	// Serial.println(nextColor.r);
-	// Serial.println(nextColor.g);
-	// Serial.println(nextColor.b);
-	// Serial.println(nextColor.w);
-	// colorTransitionAllLed(nextColor.r, nextColor.g, nextColor.b, nextColor.w, 10000);
-	// colorTransitionAllLed(0, 0, 7, 15, 10000);
-	// while (1) {
-	// 	setAllLeds(255, 0, 0, 0);
-	// 	delay(30);
-	// 	setAllLeds(0, 0, 0, 0);
-	// 	delay(50);
-	// 	setAllLeds(0, 0, 255, 0);
-	// 	delay(50);
-	// 	setAllLeds(0, 0, 0, 0);
-	// 	delay(50);
-	// }
 	colorTransitionAllLed(255, 0, 0, 0, 800);
 	// delay(1000);
 	colorTransitionAllLed(0, 255, 0, 0, 800);
@@ -64,7 +47,6 @@ void LightTask(void *pvParameters) {
 	// delay(1000);
 	colorTransitionAllLed(0, 0, 0, 0, 800);
 	// delay(1000);
-	// colorTransitionAllLed(255, 255, 255, 255, 1000);
 	while (true) {
 		Serial.println("in LightTask()");
 		if (HACKQUARIUM.inSunSimulation == 0 && HACKQUARIUM.inCloudSimulation == 0) {
@@ -171,7 +153,6 @@ void TimeTask(void *pcParameters) {
 void SunTask(void *pcParameters) {
 	CRGBW nextColor;
 	while (true) {
-		// Serial.println("In SunTask()");
 		nextColor = calculColors();
 		// Serial.print("    ");
 		// Serial.print("    actual : ");
@@ -248,70 +229,14 @@ void setup() {
 	// }
 
 
-	xTaskCreatePinnedToCore(
-					FastLEDshowTask,
-					"FastLEDshowTask",
-					1000,
-					NULL,
-					1,
-					&FastLEDshowTaskHandle,
-					0);
-	xTaskCreatePinnedToCore(
-					WeatherTask,
-					"WeatherTask",
-					10000,
-					NULL,
-					1,
-					&WeatherTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					TimeTask,
-					"TimeTask",
-					10000,
-					NULL,
-					1,
-					&TimeTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					LightTask,
-					"LightTask",
-					10000,
-					NULL,
-					1,
-					&LightTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					SunTask,
-					"SunTask",
-					10000,
-					NULL,
-					1,
-					&SunTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					CloudTask,
-					"CloudTask",
-					10000,
-					NULL,
-					1,
-					&CloudTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					RainTask,
-					"RainTask",
-					10000,
-					NULL,
-					1,
-					&RainTaskHandle,
-					1);
-	xTaskCreatePinnedToCore(
-					SensorTask,
-					"SensorTask",
-					10000,
-					NULL,
-					1,
-					&SensorTaskHandle,
-					1);
+	xTaskCreatePinnedToCore(FastLEDshowTask,"FastLEDshowTask",1000,NULL,1,&FastLEDshowTaskHandle,0);
+	xTaskCreatePinnedToCore(WeatherTask,"WeatherTask",10000,NULL,1,&WeatherTaskHandle,1);
+	xTaskCreatePinnedToCore(TimeTask,"TimeTask",10000,NULL,1,&TimeTaskHandle,1);
+	xTaskCreatePinnedToCore(LightTask,"LightTask",10000,NULL,1,&LightTaskHandle,1);
+	xTaskCreatePinnedToCore(SunTask,"SunTask",10000,NULL,1,&SunTaskHandle,1);
+	xTaskCreatePinnedToCore(CloudTask,"CloudTask",10000,NULL,1,&CloudTaskHandle,1);
+	xTaskCreatePinnedToCore(RainTask,"RainTask",10000,NULL,1,&RainTaskHandle,1);
+	xTaskCreatePinnedToCore(SensorTask,"SensorTask",10000,NULL,1,&SensorTaskHandle,1);
 }
 
 void loop() {

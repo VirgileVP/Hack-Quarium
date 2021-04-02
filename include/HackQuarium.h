@@ -5,7 +5,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include "FastLED_RGBW.h"
-# include <SPI.h>
+// # include <SPI.h>
 # include <Wire.h>
 # include <ArduinoJson.h>
 # include <Adafruit_Sensor.h>
